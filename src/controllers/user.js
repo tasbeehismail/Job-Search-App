@@ -41,6 +41,9 @@ export const login = async (req, res, next) => {
     const payload = { id: user._id, email: user.email, role: user.role, tokenType: 'access' };
     const token = generateToken(payload);
 
+    user.status = 'online';
+    await user.save();
+    
     return res.status(200).json({ message: 'User logged in successfully', Token: token });
 }
 
