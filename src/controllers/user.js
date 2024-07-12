@@ -50,7 +50,7 @@ export const verifyEmail = async (req, res, next) => {
     const user = await User.findOne({ email });
     
     if (!user) {
-       return next(new AppError('Invalid email or OTP', 404));
+       return next(new AppError('Invalid email', 404));
     }
     // Check if OTP is valid
     const result = await verify(user, otp);
@@ -77,11 +77,11 @@ export const forgotPassword = async (req, res, next) => {
 }
 
 export const resetPassword = async (req, res, next) => {
-    const { newPassword, otp } = req.body;
+    const { newPassword, otp, email } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
+      return res.status(404).json({ message: 'User not found' });
     }
     // Check if OTP is valid
     const result = await verify(user, otp);

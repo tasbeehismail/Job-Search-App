@@ -146,8 +146,14 @@ const resetPassword = Joi.object({
   otp: Joi.string().length(4).required().messages({
     'string.base': 'OTP should be a type of text',
     'string.empty': 'OTP cannot be an empty field',
-    'string.length': 'OTP should be exactly 6 characters long',
+    'string.length': 'OTP should be exactly 4 characters long',
     'any.required': 'OTP is a required field',
+  }),
+  email: Joi.string().email().trim().required().messages({
+    'string.base': 'Email should be a type of text',
+    'string.empty': 'Email cannot be an empty field',
+    'string.email': 'Email must be a valid email',
+    'any.required': 'Email is a required field',
   }),
 });
 
@@ -161,7 +167,7 @@ const verifyEmail = Joi.object({
   otp: Joi.string().length(4).required().messages({
     'string.base': 'OTP should be a type of text',
     'string.empty': 'OTP cannot be an empty field',
-    'string.length': 'OTP should be exactly 6 characters long',
+    'string.length': 'OTP should be exactly 4 characters long',
     'any.required': 'OTP is a required field',
   }),
 });
