@@ -5,6 +5,8 @@ import AppError from '../utils/appError.js';
 import { sendOTP, verifyOTP as verify } from '../services/otp.service.js';
 import resetPasswordEmailTemplate from '../view/resetPasswordEmail.js';
 import verifyEmailTemplate from '../view/verifyEmail.js';
+import router from '../routes/user.routes.js';
+
 export const signup = async (req, res, next) => {
     let { password } = req.body
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -32,7 +34,7 @@ export const login = async (req, res, next) => {
     });
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
-        return next(new AppError('Invalid email or password', 401));
+        return next(new AppError('Invalid login credentials', 401));
     }
     if (!user.confirmEmail) {
         return next(new AppError('Email not verified. Please verify your email first.', 401));
@@ -43,10 +45,9 @@ export const login = async (req, res, next) => {
 
     user.status = 'online';
     await user.save();
-    
+
     return res.status(200).json({ message: 'User logged in successfully', Token: token });
 }
-
 
 export const verifyEmail = async (req, res, next) => {
     const { email, otp } = req.body;
@@ -101,3 +102,92 @@ export const resetPassword = async (req, res, next) => {
     res.status(200).json({ message: 'Password reset successfully' });
 }
 
+export const getMe = async (req, res, next) => {
+    const user = req.user;
+    if(!user){
+        return next(new AppError('User not found', 404));
+    }
+
+    user.password = undefined;
+    user.otp = undefined;
+    res.status(200).json({ data: user });
+}
+
+export const getOtherUser = async (req, res, next) => {
+    const { id } = req.params;
+    const user = await User.findById(id).select('-password -otp -confirmEmail');
+    if(!user){
+        return next(new AppError('User not found', 404));
+    }
+    res.status(200).json({ data: user });
+}
+
+export const getAccountsByRecoveryEmail = async (req, res, next) => {
+    const { recoveryEmail } = req.body;
+    const users = await User.find({ recoveryEmail }).select('-password -otp -confirmEmail');
+
+    if (!users.length) {
+        return next(new AppError('No accounts found with the provided recovery email', 404));
+    }
+
+    res.status(200).json({
+        results: users.length,
+        data: {
+            users
+        }
+    });
+}
+
+export const updateAccount = async (req, res, next) => {
+    const { email, mobileNumber, recoveryEmail, firstName, lastName, DOB } = req.body;
+    const user = req.user;
+    if(!user){
+        return next(new AppError('User not found', 404));
+    }
+    
+    user.email = email || user.email;
+    user.mobileNumber = mobileNumber || user.mobileNumber;
+    user.recoveryEmail = recoveryEmail || user.recoveryEmail;
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.DOB = DOB || user.DOB;
+    await user.save();
+
+    user.password = undefined;
+    user.otp = undefined;
+
+    res.status(200).json({ data: user });
+}
+
+export const deleteAccount = async (req, res, next) => {
+    const user = req.user;
+    if(!user){
+        return next(new AppError('User not found', 404));
+    }
+
+    await User.deleteOne({ _id: user._id });
+
+    res.status(200).json({
+        message: 'User account has been deleted successfully',
+    });
+}
+
+export const updatePassword = async (req, res, next) => {
+    const { currentPassword, newPassword } = req.body;
+    const user = req.user;
+    console.log(user);
+    if(!user){
+        return next(new AppError('User not found', 404));
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if(!isMatch){
+        return next(new AppError('Current password is incorrect', 400));
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+}

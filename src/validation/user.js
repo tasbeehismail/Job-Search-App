@@ -30,6 +30,7 @@ const signUp = Joi.object({
     'string.empty': 'Password cannot be empty.',
     'string.min': 'Password must be at least {#limit} characters long.',
     'string.max': 'Password cannot exceed {#limit} characters.',
+    'string.pattern.base': 'Password must only contain letters and numbers and be between 3 to 30 characters long.',
   }),
   DOB: Joi.date().iso().required().messages({
     'any.required': 'Date of birth is required.',
@@ -93,9 +94,11 @@ const updateAccount = Joi.object({
 });
 
 const getOtherUser = Joi.object({
-  userId: Joi.string().required().messages({
+  id: Joi.string().required().hex().length(24).messages({
     'any.required': 'User ID is required.',
     'string.empty': 'User ID cannot be empty.',
+    'string.hex': 'User ID must be a hexadecimal string.',
+    'string.length': 'User ID must be 24 characters long.',
   }),
 });
 
@@ -111,6 +114,8 @@ const updatePassword = Joi.object({
     'string.empty': 'New password cannot be empty.',
     'string.min': 'New password must be at least {#limit} characters long.',
     'string.max': 'New password cannot exceed {#limit} characters.',
+    'string.pattern.base': 'New password must only contain letters and numbers and be between 3 to 30 characters long.',
+
   }),
   confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required().messages({
     'any.required': 'Confirm password is required.',
@@ -142,6 +147,7 @@ const resetPassword = Joi.object({
     'string.empty': 'New password cannot be an empty field',
     'string.min': 'New password should have a minimum length of 8',
     'any.required': 'New password is a required field',
+    'string.pattern.base': 'New password must only contain letters and numbers and be between 3 to 30 characters long',
   }),
   otp: Joi.string().length(4).required().messages({
     'string.base': 'OTP should be a type of text',
