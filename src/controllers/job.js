@@ -54,8 +54,9 @@ export const deleteJob = async (req, res, next) => {
         return next(new AppError('Only the job owner can delete the data', 403));
     }
 
+    await Application.deleteMany({ jobId: job._id });
     await job.deleteOne(job._id);
-    return res.status(200).json({ message: 'Job deleted successfully' });
+    return res.status(200).json({ message: 'Job and related applications deleted successfully' });
 }
 
 export const getAllJobs = async (req, res, next) => {

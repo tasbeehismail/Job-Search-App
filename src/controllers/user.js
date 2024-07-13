@@ -1,4 +1,7 @@
 import User from '../models/user.js';
+import Company from '../models/company.js';
+import Job from '../models/job.js';
+import Application from '../models/application.js';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '../services/auth.service.js';
 import AppError from '../utils/appError.js';
@@ -159,15 +162,40 @@ export const updateAccount = async (req, res, next) => {
 }
 
 export const deleteAccount = async (req, res, next) => {
-    const user = req.user;
-    if(!user){
+    const userId = req.user._id;
+    if(!userId){
         return next(new AppError('User not found', 404));
     }
 
-    await User.deleteOne({ _id: user._id });
+    // Delete all applications related to this user
+    await Application.deleteMany({ userId: userId });
 
+    // If the user is a company HR, delete related jobs and handle the company
+    if (req.user.role === 'Company_HR') {
+      // Find the company associated with this HR
+      const company = await Company.findOne({ companyHR: userId });
+
+      if (company) {
+        const companyId = company._id;
+
+        // Delete all jobs related to this company
+        const jobs = await Job.find({ companyId: companyId });
+        const jobIds = jobs.map(job => job._id);
+
+        await Job.deleteMany({ companyId: companyId });
+
+        // Delete all applications related to these jobs
+        await Application.deleteMany({ jobId: { $in: jobIds } });
+
+        // Finally, delete the company
+        await Company.findByIdAndDelete(companyId);
+      }
+    }
+
+    // Finally, delete the user
+    await User.findByIdAndDelete(userId);
     res.status(200).json({
-        message: 'User account has been deleted successfully',
+        message: 'User account and related documents deleted successfully',
     });
 }
 

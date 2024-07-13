@@ -2,6 +2,7 @@ import Company from '../models/company.js';
 import AppError from '../utils/appError.js';
 import Job from '../models/job.js';
 import Application from '../models/application.js';
+import User from '../models/user.js';
 
 export const addCompany = async (req, res, next) => {
     const companyHR = req.user._id;
@@ -50,8 +51,24 @@ export const deleteCompany = async (req, res, next) => {
         return next(new AppError('Only the company owner can delete the data', 403));
     }
 
-    await company.deleteOne(company._id);
-    return res.status(200).json({ message: 'Company deleted successfully' });
+    const jobs = await Job.find({ addedBy: company.companyHR });
+    const jobIds = jobs.map(job => job._id);
+
+    await Job.deleteMany({ addedBy: company.companyHR });
+
+    // Delete all applications related to these jobs
+    await Application.deleteMany({ jobId: { $in: jobIds } });
+
+    // Update users who were company HR of this company
+    await User.updateMany(
+      { _id: company.companyHR },
+      { $set: { role: 'User' } }
+    );
+
+    // Finally, delete the company
+    await Company.findByIdAndDelete(companyId);
+
+    return res.status(200).json({ message: 'Company and related documents deleted successfully' });
 }
 
 export const getCompany = async (req, res, next) => {
