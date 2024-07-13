@@ -4,39 +4,41 @@ import asyncHandler from '../utils/asyncHandler.js';
 import * as schema from "../validation/company.js";
 import { validate } from "../services/validator.service.js";
 import { verifyToken } from "../services/auth.service.js";
-import { checkCompanyHR } from '../middleware/checkCompanyHR.js';
+import { authorizeRoles } from '../middleware/authorizeRoles.js';
  
 const router = Router();
 
 router.post('/add', 
     verifyToken(),
-    asyncHandler(checkCompanyHR),
+    asyncHandler(authorizeRoles('Company_HR')),
     validate(schema.addCompany), 
     asyncHandler(companyController.addCompany)
 );
 
 router.patch('/update',
     verifyToken(),
-    asyncHandler(checkCompanyHR),
+    asyncHandler(authorizeRoles('Company_HR')),
     validate(schema.updateCompany),
     asyncHandler(companyController.updateCompany)
 )
 
 router.delete('/delete', 
     verifyToken(),
-    asyncHandler(checkCompanyHR),
+    asyncHandler(authorizeRoles('Company_HR')),
     asyncHandler(companyController.deleteCompany)
 );
 
-router.get('/:id', 
+router.get('/specific/:id', 
     verifyToken(),
-    asyncHandler(checkCompanyHR),
+    asyncHandler(authorizeRoles('Company_HR')),
     validate(schema.getCompany),
     asyncHandler(companyController.getCompany)
 );
 
 router.get('/search', 
     verifyToken(),
+    asyncHandler(authorizeRoles('Company_HR', 'User')),
+    validate(schema.searchCompany),
     asyncHandler(companyController.searchCompany)
 );
 

@@ -4,13 +4,13 @@ import asyncHandler from '../utils/asyncHandler.js';
 import * as schema from "../validation/job.js";
 import { validate } from "../services/validator.service.js";
 import { verifyToken } from "../services/auth.service.js";
-import { checkCompanyHR } from '../middleware/checkCompanyHR.js';
+import { authorizeRoles } from '../middleware/authorizeRoles.js';
  
 const router = Router();
 
 router.post('/add', 
     verifyToken(),
-    asyncHandler(checkCompanyHR),
+    asyncHandler(authorizeRoles('CompanyHR')),
     validate(schema.addJob), 
     asyncHandler(jobController.addJob)
 )
