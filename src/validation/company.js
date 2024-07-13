@@ -96,15 +96,25 @@ const getCompany = Joi.object({
 });
 
 const searchCompany = Joi.object({
-  q: Joi.string().min(1).required().messages({
+  q: Joi.string().required().messages({
     'string.empty': 'Search query cannot be empty',
     'any.required': 'Search query is required'
-  })
+    })
+});
+
+const getApplications = Joi.object({
+  jobId: Joi.string().required().hex().length(24).messages({
+    'any.required': 'Job ID is required.',
+    'string.empty': 'Job ID cannot be empty.',
+    'string.hex': 'Job ID must be a hexadecimal string.',
+    'string.length': 'Job ID must be 24 characters long.',
+  }),
 });
 
 export {
   addCompany,
   updateCompany,
   getCompany,
-  searchCompany
+  searchCompany, 
+  getApplications
 };

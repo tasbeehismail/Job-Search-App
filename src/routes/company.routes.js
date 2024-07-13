@@ -45,6 +45,8 @@ router.get('/search',
 router.get('/:jobId/applications', 
     verifyToken(),
     authorizeRoles('Company_HR'),
+    validate(schema.getApplications),
     asyncHandler(companyController.getApplications)
 );
+
 export default router
