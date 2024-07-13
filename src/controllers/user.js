@@ -5,7 +5,6 @@ import AppError from '../utils/appError.js';
 import { sendOTP, verifyOTP as verify } from '../services/otp.service.js';
 import resetPasswordEmailTemplate from '../view/resetPasswordEmail.js';
 import verifyEmailTemplate from '../view/verifyEmail.js';
-import router from '../routes/user.routes.js';
 
 export const signup = async (req, res, next) => {
     let { password } = req.body

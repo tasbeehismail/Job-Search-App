@@ -35,7 +35,7 @@ export const verifyToken =  (secret = process.env.JWT_SECRET, isBearer = false) 
       }
 
       try {
-          const decoded =  jwt.verify(token, secret);
+          const decoded = jwt.verify(token, secret);
           req.user = await User.findById(decoded.id);
           next();
       } catch (error) {
