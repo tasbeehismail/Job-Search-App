@@ -12,10 +12,24 @@ const router = Router();
 
 router.post('/add', 
     verifyToken(),
-    authorizeRoles('CompanyHR'),
+    authorizeRoles('Company_HR'),
     validate(schema.addJob), 
     asyncHandler(jobController.addJob)
 )
+
+router.patch('/update/:id',
+    verifyToken(),
+    authorizeRoles('Company_HR'),
+    validate(schema.updateJob),
+    asyncHandler(jobController.updateJob)
+)
+
+router.delete('/delete/:id', 
+    verifyToken(),
+    authorizeRoles('Company_HR'),
+    validate(schema.jobId),
+    asyncHandler(jobController.deleteJob)
+);
 
 router.post('/apply/:jobId', 
     verifyToken(),

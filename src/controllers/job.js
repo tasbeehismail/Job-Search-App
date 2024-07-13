@@ -19,6 +19,44 @@ export const addJob = async (req, res, next) => {
     return res.status(200).json({ message: 'Job added successfully', data: job });
 }
 
+export const updateJob = async (req, res, next) => {
+    const jobId = req.params.id
+    const job = await Job.findById({ _id: jobId });
+    if(!job) {
+        return next(new AppError('Job not found', 404));
+    }
+    if(job.addedBy.toString() !== req.user._id.toString()) {
+        return next(new AppError('Only the job owner can update the data', 403));
+    }
+
+    const { jobTitle, jobLocation, workingTime, seniorityLevel, jobDescription, technicalSkills, softSkills } = req.body;
+    job.jobTitle = jobTitle || job.jobTitle;
+    job.jobLocation = jobLocation || job.jobLocation;
+    job.workingTime = workingTime || job.workingTime;
+    job.seniorityLevel = seniorityLevel || job.seniorityLevel;
+    job.jobDescription = jobDescription || job.jobDescription;
+    job.technicalSkills = technicalSkills || job.technicalSkills;
+    job.softSkills = softSkills || job.softSkills;
+    await job.save();
+
+    return res.status(200).json({ message: 'Job updated successfully', data: job });
+}
+
+export const deleteJob = async (req, res, next) => {
+    const jobId = req.params.id
+    const job = await Job.findById({ _id: jobId });
+    if(!job) {
+        return next(new AppError('Job not found', 404));
+    }
+    if(job.addedBy.toString() !== req.user._id.toString()) {
+        return next(new AppError('Only the job owner can delete the data', 403));
+    }
+
+    await job.deleteOne(job._id);
+    return res.status(200).json({ message: 'Job deleted successfully' });
+}
+
+
 export const applyJob = async (req, res, next) => {
     const { jobId } = req.params;
     const userId = req.user._id;
