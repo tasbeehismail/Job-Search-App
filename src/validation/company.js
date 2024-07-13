@@ -3,47 +3,101 @@ import Joi from 'joi';
 // Regex to match the range format (1-10, 11-20, ...)
 const numberOfEmployeesRegex = /^\d+-\d+$/;
 
-const addCompany = Joi.object({
+// Common validation messages
+const stringMessages = {
+  base: 'must be a string.',
+  empty: 'cannot be empty.',
+  required: 'is required.'
+};
+
+const rangeMessages = {
+  base: 'must be in the format of a range (e.g., 1-10, 11-20).',
+  custom: 'The upper bound must be greater than the lower bound.'
+};
+
+// Custom validation for number of employees range
+const numberOfEmployeesValidation = (value, helpers) => {
+  const [lower, upper] = value.split('-').map(Number);
+  if (lower >= upper) {
+    return helpers.message(rangeMessages.custom);
+  }
+  return value;
+};
+
+// Company schema
+const companySchema = {
   companyName: Joi.string().required().messages({
-    'string.base': 'Company name must be a string.',
-    'string.empty': 'Company name cannot be empty.',
-    'any.required': 'Company name is required.'
+    'string.base': `Company name ${stringMessages.base}`,
+    'string.empty': `Company name ${stringMessages.empty}`,
+    'any.required': `Company name ${stringMessages.required}`
   }),
   description: Joi.string().required().messages({
-    'string.base': 'Description must be a string.',
-    'string.empty': 'Description cannot be empty.',
-    'any.required': 'Description is required.'
+    'string.base': `Description ${stringMessages.base}`,
+    'string.empty': `Description ${stringMessages.empty}`,
+    'any.required': `Description ${stringMessages.required}`
   }),
   industry: Joi.string().required().messages({
-    'string.base': 'Industry must be a string.',
-    'string.empty': 'Industry cannot be empty.',
-    'any.required': 'Industry is required.'
+    'string.base': `Industry ${stringMessages.base}`,
+    'string.empty': `Industry ${stringMessages.empty}`,
+    'any.required': `Industry ${stringMessages.required}`
   }),
   address: Joi.string().required().messages({
-    'string.base': 'Address must be a string.',
-    'string.empty': 'Address cannot be empty.',
-    'any.required': 'Address is required.'
+    'string.base': `Address ${stringMessages.base}`,
+    'string.empty': `Address ${stringMessages.empty}`,
+    'any.required': `Address ${stringMessages.required}`
   }),
-  numberOfEmployees: Joi.string().pattern(numberOfEmployeesRegex).required().custom((value, helpers) => {
-    const [lower, upper] = value.split('-').map(Number);
-    if (lower >= upper) {
-      return helpers.message('The upper bound must be greater than the lower bound.');
-    }
-    return value;
-  }).messages({
-    'string.base': 'Number of employees must be a string.',
-    'string.empty': 'Number of employees cannot be empty.',
-    'string.pattern.base': 'Number of employees must be in the format of a range (e.g., 1-10, 11-20).',
-    'any.required': 'Number of employees is required.'
+  numberOfEmployees: Joi.string().pattern(numberOfEmployeesRegex).required()
+  .custom(numberOfEmployeesValidation)
+  .messages({
+    'string.base': `Number of employees ${stringMessages.base}`,
+    'string.empty': `Number of employees ${stringMessages.empty}`,
+    'string.pattern.base': `Number of employees ${rangeMessages.base}`,
+    'any.required': `Number of employees ${stringMessages.required}`
   }),
   companyEmail: Joi.string().email().required().messages({
-    'string.base': 'Company email must be a string.',
+    'string.base': `Company email ${stringMessages.base}`,
     'string.email': 'Company email must be a valid email.',
-    'string.empty': 'Company email cannot be empty.',
-    'any.required': 'Company email is required.'
+    'string.empty': `Company email ${stringMessages.empty}`,
+    'any.required': `Company email ${stringMessages.required}`
+  })
+};
+
+// Add company schema
+const addCompany = Joi.object(companySchema);
+
+// Update company schema (all fields optional)
+const updateCompany = Joi.object({
+  companyName: Joi.string().messages({
+    'string.base': `Company name ${stringMessages.base}`,
+    'string.empty': `Company name ${stringMessages.empty}`,
+  }),
+  description: Joi.string().messages({
+    'string.base': `Description ${stringMessages.base}`,
+    'string.empty': `Description ${stringMessages.empty}`,
+  }),
+  industry: Joi.string().messages({
+    'string.base': `Industry ${stringMessages.base}`,
+    'string.empty': `Industry ${stringMessages.empty}`,
+  }),
+  address: Joi.string().messages({
+    'string.base': `Address ${stringMessages.base}`,
+    'string.empty': `Address ${stringMessages.empty}`,
+  }),
+  numberOfEmployees: Joi.string().pattern(numberOfEmployeesRegex)
+  .custom(numberOfEmployeesValidation)
+  .messages({
+    'string.base': `Number of employees ${stringMessages.base}`,
+    'string.empty': `Number of employees ${stringMessages.empty}`,
+    'string.pattern.base': `Number of employees ${rangeMessages.base}`,
+  }),
+  companyEmail: Joi.string().email().messages({
+    'string.base': `Company email ${stringMessages.base}`,
+    'string.email': 'Company email must be a valid email.',
+    'string.empty': `Company email ${stringMessages.empty}`,
   })
 });
 
 export {
-  addCompany
+  addCompany,
+  updateCompany
 };
