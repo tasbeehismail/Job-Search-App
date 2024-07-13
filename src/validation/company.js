@@ -95,9 +95,16 @@ const getCompany = Joi.object({
   }),
 });
 
+const searchCompany = Joi.object({
+  q: Joi.string().min(1).required().messages({
+    'string.empty': 'Search query cannot be empty',
+    'any.required': 'Search query is required'
+  })
+});
 
 export {
   addCompany,
   updateCompany,
-  getCompany
+  getCompany,
+  searchCompany
 };

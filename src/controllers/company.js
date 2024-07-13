@@ -59,6 +59,17 @@ export const getCompany = async (req, res, next) => {
     const companyData = company.toObject();
     companyData.jobs = jobs;
     
-
     return res.status(200).json({ data: companyData });
+}
+
+export const searchCompany = async (req, res, next) => {
+    const query = req.query.q;
+
+    const companies = await Company.find({ companyName: { $regex: query, $options: 'i' } });
+    
+    if (!companies.length) {
+        return next(new AppError('No companies found with that name', 404));
+    }
+
+    return res.status(200).json({ data: companies });
 }
