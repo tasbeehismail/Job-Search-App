@@ -22,20 +22,23 @@ export const generateToken = (payload, secret = process.env.JWT_SECRET, expiresI
 
 export const verifyToken =  (secret = process.env.JWT_SECRET, isBearer = false) => {
   return async (req, res, next) => {
+
       const header = req.headers.authorization || req.headers.token;
       
       if (!header) {
         throw next(new AppError('Authorization header is required', 401));
       }
-
+      // Check if the token is a Bearer token
       const token = isBearer ? header.split(' ')[1] : header;
-
+      // Check if the token is valid
       if (!token) {
         throw next(new AppError('JWT must be provided', 401));
       }
 
       try {
+          // Verify the token
           const decoded = jwt.verify(token, secret);
+          // Attach the user to the request
           req.user = await User.findById(decoded.id);
           next();
       } catch (error) {

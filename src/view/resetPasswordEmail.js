@@ -1,12 +1,25 @@
+/**
+ * Returns an HTML email template for resetting a user's password.
+ * @param {string} fullName - The full name of the user.
+ * @param {string} otp - The one-time password for password reset.
+ * @returns {string} An HTML email template.
+ */
 const resetPasswordEmailTemplate = (fullName, otp) => {
+    // Construct the reset URL with the base URL from the environment variables.
     const resetUrl = `${process.env.BASE_URL}/user/reset-password`;
+
+    // Return the HTML email template.
     return `
       <!DOCTYPE html>
       <html lang="en">
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+          <!-- Set the title of the email -->
           <title>Password Reset</title>
+
+          <!-- Define the styles for the email -->
           <style>
               body {
                   font-family: Arial, sans-serif;
@@ -18,6 +31,7 @@ const resetPasswordEmailTemplate = (fullName, otp) => {
                   align-items: center;
                   height: 100vh;
               }
+
               .container {
                   background-color: #fff;
                   padding: 30px;
@@ -27,14 +41,17 @@ const resetPasswordEmailTemplate = (fullName, otp) => {
                   max-width: 500px;
                   width: 100%;
               }
+
               h1 {
                   color: #333;
                   margin-bottom: 20px;
               }
+
               p {
                   color: #666;
                   margin-bottom: 20px;
               }
+
               a {
                   display: inline-block;
                   background-color: #333;
@@ -44,6 +61,7 @@ const resetPasswordEmailTemplate = (fullName, otp) => {
                   border-radius: 5px;
                   font-size: 16px;
               }
+
               a:hover {
                   background-color: #666;
               }

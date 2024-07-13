@@ -1,3 +1,9 @@
+/**
+ * Email verification template for sending OTP to users
+ * @param {string} fullName - Full name of the user
+ * @param {string} otp - One-Time Password (OTP) for verification
+ * @returns {string} Email verification template
+ */
 const verifyEmailTemplate = (fullName, otp) => {
     const verifyUrl = `${process.env.BASE_URL}/user/verify-email`;
     return `
@@ -8,6 +14,7 @@ const verifyEmailTemplate = (fullName, otp) => {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Email Verification</title>
             <style>
+                /* Style for the email verification template */
                 body {
                     font-family: Arial, sans-serif;
                     background-color: #f4f4f4;
