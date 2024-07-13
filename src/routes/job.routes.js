@@ -12,14 +12,14 @@ const router = Router();
 
 router.post('/add', 
     verifyToken(),
-    asyncHandler(authorizeRoles('CompanyHR')),
+    authorizeRoles('CompanyHR'),
     validate(schema.addJob), 
     asyncHandler(jobController.addJob)
 )
 
 router.post('/apply/:jobId', 
     verifyToken(),
-    asyncHandler(authorizeRoles('User')),
+    authorizeRoles('User'),
     uploadSingleFile('userResume'), // Handle the file upload
     validate(applyJobSchema),
     asyncHandler(jobController.applyJob)

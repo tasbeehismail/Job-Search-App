@@ -10,40 +10,41 @@ const router = Router();
 
 router.post('/add', 
     verifyToken(),
-    asyncHandler(authorizeRoles('Company_HR')),
+    authorizeRoles('Company_HR'),
     validate(schema.addCompany), 
     asyncHandler(companyController.addCompany)
 );
 
 router.patch('/update',
     verifyToken(),
-    asyncHandler(authorizeRoles('Company_HR')),
+    authorizeRoles('Company_HR'),
     validate(schema.updateCompany),
     asyncHandler(companyController.updateCompany)
 )
 
 router.delete('/delete', 
     verifyToken(),
-    asyncHandler(authorizeRoles('Company_HR')),
+    authorizeRoles('Company_HR'),
     asyncHandler(companyController.deleteCompany)
 );
 
 router.get('/specific/:id', 
     verifyToken(),
-    asyncHandler(authorizeRoles('Company_HR')),
+    authorizeRoles('Company_HR'),
     validate(schema.getCompany),
     asyncHandler(companyController.getCompany)
 );
 
 router.get('/search', 
     verifyToken(),
-    asyncHandler(authorizeRoles('Company_HR', 'User')),
+    authorizeRoles('Company_HR', 'User'),
     validate(schema.searchCompany),
     asyncHandler(companyController.searchCompany)
 );
 
-router.get('/:id/applications', 
+router.get('/:jobId/applications', 
     verifyToken(),
+    authorizeRoles('Company_HR'),
     asyncHandler(companyController.getApplications)
 );
 export default router
