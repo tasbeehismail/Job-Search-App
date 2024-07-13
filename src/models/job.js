@@ -34,7 +34,7 @@ const jobSchema = new mongoose.Schema({
   },
   addedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Assuming 'User' is the model for company HR
+    ref: 'User', 
     required: true
   }
 }, {
