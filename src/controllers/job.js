@@ -149,7 +149,30 @@ export const getJobsByCompanyName = async (req, res, next) => {
     return res.status(200).json({ data: formattedJobs });
 }
 
+export const getJobsByFilters = async (req, res, next) => {
+    const { workingTime, jobLocation, seniorityLevel, jobTitle, technicalSkills } = req.query;
 
+    const filter = {};
+    workingTime ? filter.workingTime = workingTime : null;
+    jobLocation ? filter.jobLocation = jobLocation : null;
+    seniorityLevel ? filter.seniorityLevel = seniorityLevel : null;
+    jobTitle ? filter.jobTitle = jobTitle : null;
+    if (technicalSkills) {
+        if (!Array.isArray(technicalSkills)) {
+            technicalSkills = [technicalSkills];
+        }
+        filter.technicalSkills = { $all: technicalSkills };
+    }
+
+    if (!Object.keys(filter).length) {
+        return next(new AppError('No filters provided. Please provide at least one filter.', 400));
+    }
+    const jobs = await Job.find({ ...filter });
+    if(!jobs.length) {
+        return next(new AppError('No jobs found with that filter', 404));
+    }
+    return res.status(200).json({ message: 'Jobs retrieved successfully', data: jobs });
+}
 
 export const applyJob = async (req, res, next) => {
     const { jobId } = req.params;

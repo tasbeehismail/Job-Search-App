@@ -44,6 +44,12 @@ router.get('/company',
     asyncHandler(jobController.getJobsByCompanyName)
 );
 
+router.get('/filter',
+    verifyToken(),
+    authorizeRoles('Company_HR', 'User'),
+    validate(schema.getJobsByFilters),
+    asyncHandler(jobController.getJobsByFilters)
+);
 
 router.post('/apply/:jobId', 
     verifyToken(),

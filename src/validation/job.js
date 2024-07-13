@@ -81,9 +81,52 @@ const getJobsByCompanyName = Joi.object({
     })
 });
 
+const getJobsByFilters = Joi.object({
+  workingTime: Joi.string()
+    .valid('full-time', 'part-time')
+    .optional()
+    .messages({
+      'any.only': 'Working time must be either "full-time" or "part-time"',
+      'string.empty': 'Working time cannot be empty'
+    }),
+  jobLocation: Joi.string()
+    .valid('onsite', 'remotely', 'hybrid')
+    .optional()
+    .messages({
+      'any.only': 'Job location must be one of "onsite", "remotely", or "hybrid"',
+      'string.empty': 'Job location cannot be empty'
+    }),
+  seniorityLevel: Joi.string()
+    .valid('Junior', 'Mid-Level', 'Senior', 'Team-Lead', 'CTO')
+    .optional()
+    .messages({
+      'any.only': 'Seniority level must be one of the specified values',
+      'string.empty': 'Seniority level cannot be empty'
+    }),
+  jobTitle: Joi.string()
+    .optional()
+    .messages({
+      'string.empty': 'Job title cannot be empty'
+    }),
+  technicalSkills: Joi.alternatives()
+    .try(
+      Joi.string().allow('').optional(),
+      Joi.array().items(Joi.string())
+    )
+    .optional()
+    .messages({
+      'array.base': 'Technical skills must be an array',
+      'string.empty': 'Technical skills cannot be empty'
+    })
+}).messages({
+  'object.unknown': 'Query parameter {{#label}} is not allowed'
+});
+
+
 export { 
   addJob,
   updateJob, 
   jobId,
-  getJobsByCompanyName
+  getJobsByCompanyName,
+  getJobsByFilters
 };
