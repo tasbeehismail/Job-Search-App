@@ -8,8 +8,8 @@ import { verifyToken } from "../services/auth.service.js";
 const router = Router();
 
 router.get('/:companyId/:date', 
-    //verifyToken(),
-    //validate(schema.getApplicationsForCompany),
+    verifyToken(),
+    validate(schema.getApplicationsForCompany),
     asyncHandler(getApplicationsForCompany)
 );
 

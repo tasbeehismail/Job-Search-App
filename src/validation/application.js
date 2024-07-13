@@ -24,4 +24,15 @@ const applyJobSchema = Joi.object({
     })
 });
 
-export { applyJobSchema };
+const getApplicationsForCompany = Joi.object({
+  companyId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/)
+    .messages({
+      'string.empty': 'Company ID is required.',
+      'string.pattern.base': 'Company ID must be a valid hexadecimal string.',
+    }),
+    date: Joi.date().iso().messages({
+      'date.base': 'Date must be in YYYY-MM-DD format.',
+    }),
+});
+
+export { applyJobSchema, getApplicationsForCompany };

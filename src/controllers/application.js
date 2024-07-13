@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import Application from '../models/application.js';
 import Job from '../models/job.js';
 import Company from '../models/company.js';
+import AppError from '../utils/appError.js';
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,14 +20,19 @@ const __dirname = path.dirname(__filename);
  */
 export const getApplicationsForCompany = async (req, res) => {
     const { companyId, date } = req.params;
+    // Convert the date string to a Date object
     const startOfDay = moment(date).startOf('day').toDate();
     const endOfDay = moment(date).endOf('day').toDate();
     
     // Find the company and the jobs added by the company HR
     const company = await Company.findById(companyId);
+    if (!company) {
+        throw new AppError('Company not found', 404);
+    }
     const companyHR = company.companyHR;
     const companyJobs = await Job.find({ addedBy: companyHR });
     const jobIds = companyJobs.map(job => job._id);
+
 
     // Find all the applications for the jobs added by the company HR
     // on the given date
