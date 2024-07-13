@@ -56,6 +56,12 @@ const addCompany = Joi.object({
 
 // Update company schema (all fields optional)
 const updateCompany = Joi.object({
+  id: Joi.string().required().hex().length(24).messages({
+    'any.required': 'Company ID is required.',
+    'string.empty': 'Company ID cannot be empty.',
+    'string.hex': 'Company ID must be a hexadecimal string.',
+    'string.length': 'Company ID must be 24 characters long.',
+  }),
   companyName: Joi.string().messages({
     'string.base': `Company name must be a string.`,
     'string.empty': `Company name cannot be empty.`,
@@ -86,14 +92,14 @@ const updateCompany = Joi.object({
   })
 });
 
-const getCompany = Joi.object({
+const companyId = Joi.object({
   id: Joi.string().required().hex().length(24).messages({
     'any.required': 'Company ID is required.',
     'string.empty': 'Company ID cannot be empty.',
     'string.hex': 'Company ID must be a hexadecimal string.',
     'string.length': 'Company ID must be 24 characters long.',
   }),
-});
+})
 
 const searchCompany = Joi.object({
   q: Joi.string().required().messages({
@@ -114,7 +120,7 @@ const getApplications = Joi.object({
 export {
   addCompany,
   updateCompany,
-  getCompany,
+  companyId,
   searchCompany, 
   getApplications
 };

@@ -15,23 +15,24 @@ router.post('/add',
     asyncHandler(companyController.addCompany)
 );
 
-router.patch('/update',
+router.patch('/update/:id',
     verifyToken(),
     authorizeRoles('Company_HR'),
     validate(schema.updateCompany),
     asyncHandler(companyController.updateCompany)
 )
 
-router.delete('/delete', 
+router.delete('/delete/:id', 
     verifyToken(),
     authorizeRoles('Company_HR'),
+    validate(schema.companyId),
     asyncHandler(companyController.deleteCompany)
 );
 
 router.get('/specific/:id', 
     verifyToken(),
     authorizeRoles('Company_HR'),
-    validate(schema.getCompany),
+    validate(schema.companyId),
     asyncHandler(companyController.getCompany)
 );
 

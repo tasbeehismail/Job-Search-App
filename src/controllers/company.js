@@ -19,9 +19,13 @@ export const addCompany = async (req, res, next) => {
 }
 
 export const updateCompany = async (req, res, next) => {
-    const company = await Company.findOne({ companyHR: req.user._id });
+    const companyId = req.params.id
+    const company = await Company.findById({ _id: companyId });
     if(!company) {
         return next(new AppError('Company not found', 404));
+    }
+    if(company.companyHR.toString() !== req.user._id.toString()) {
+        return next(new AppError('Only the company owner can update the data', 403));
     }
 
     const { companyName, description, industry, address, numberOfEmployees, companyEmail } = req.body;
@@ -37,9 +41,13 @@ export const updateCompany = async (req, res, next) => {
 }
 
 export const deleteCompany = async (req, res, next) => {
-    const company = await Company.findOne({ companyHR: req.user._id });
+    const companyId = req.params.id
+    const company = await Company.findById({ _id: companyId });
     if(!company) {
-        return next(new AppError('Company not found or you are not owner of any company', 404));
+        return next(new AppError('Company not found', 404));
+    }
+    if(company.companyHR.toString() !== req.user._id.toString()) {
+        return next(new AppError('Only the company owner can delete the data', 403));
     }
 
     await company.deleteOne(company._id);
