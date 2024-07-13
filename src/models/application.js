@@ -29,7 +29,7 @@ const applicationSchema = new mongoose.Schema({
 
 
 applicationSchema.post('init', function (application) {
-  application.url = `${process.env.BASE_URL}/uploads/${application.url}`
+  application.userResume = `${process.env.BASE_URL}/uploads/${application.userResume}`
 });
 
 

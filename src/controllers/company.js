@@ -1,6 +1,7 @@
 import Company from '../models/company.js';
 import AppError from '../utils/appError.js';
 import Job from '../models/job.js';
+import Application from '../models/application.js';
 
 export const addCompany = async (req, res, next) => {
     const companyHR = req.user._id;
@@ -72,4 +73,35 @@ export const searchCompany = async (req, res, next) => {
     }
 
     return res.status(200).json({ data: companies });
+}
+
+export const getApplications = async (req, res, next) => {
+    const { jobId } = req.params;
+    const userId = req.user._id; // This is the company owner's ID
+
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+        return next(new AppError('Job not found', 404));
+    }
+
+    if (job.addedBy.toString() !== userId.toString()) {
+        return next(new AppError('You do not have permission to view applications for this job', 403));
+    }
+
+    const applications = await Application.find({ jobId }).populate('userId');
+
+    const formattedApplications = applications.map(app => ({
+        _id: app._id,
+        jobId: app.jobId,
+        userTechSkills: app.userTechSkills,
+        userSoftSkills: app.userSoftSkills,
+        userResume: app.userResume,
+        user: app.userId 
+    }));
+
+    res.status(200).json({
+        message: 'Applications retrieved successfully',
+        data: formattedApplications
+    });
 }

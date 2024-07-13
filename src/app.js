@@ -13,6 +13,8 @@ dotenv.config();
 const bootstrap = async (app) => {
     app.use(express.json());
     
+    app.use('/uploads', express.static('uploads'));
+
     await connectDB();
 
     app.use(routes);
