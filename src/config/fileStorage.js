@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
 
 const fileFilter = (fieldName) => {
   return (req, file, cb) => {
-    if (file.mimetype.startsWith(fieldName)) {
+    if (file.mimetype.startsWith('application/pdf')) {
       cb(null, true);
     } else {
       cb(new AppError(`Not an ${fieldName}! Please upload only ${fieldName}.`, 400), false);

@@ -1,5 +1,5 @@
 import multer from 'multer';
-import { storage, fileFilter } from './fileStorageConfig.js';
+import { storage, fileFilter } from '../config/fileStorage.js';
 
 const upload = (fieldName, isMultiple = false) => {
   const multerInstance = multer({

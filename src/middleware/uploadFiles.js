@@ -1,4 +1,4 @@
-import { upload } from './uploadService.js';
+import { upload } from '../services/upload.service.js';
 
 const uploadSingleFile = (fieldName) => upload(fieldName, false);
 
