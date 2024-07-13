@@ -74,8 +74,16 @@ const jobId = Joi.object({
   }),
 })
 
+const getJobsByCompanyName = Joi.object({
+  q: Joi.string().required().messages({
+    'string.empty': 'Search query cannot be empty',
+    'any.required': 'Search query is required'
+    })
+});
+
 export { 
   addJob,
   updateJob, 
-  jobId
+  jobId,
+  getJobsByCompanyName
 };

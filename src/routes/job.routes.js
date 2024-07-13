@@ -31,6 +31,20 @@ router.delete('/delete/:id',
     asyncHandler(jobController.deleteJob)
 );
 
+router.get('/all', 
+    verifyToken(),
+    authorizeRoles('Company_HR', 'User'),
+    asyncHandler(jobController.getAllJobs)
+);
+
+router.get('/company', 
+    verifyToken(),
+    authorizeRoles('Company_HR', 'User'),
+    validate(schema.getJobsByCompanyName),
+    asyncHandler(jobController.getJobsByCompanyName)
+);
+
+
 router.post('/apply/:jobId', 
     verifyToken(),
     authorizeRoles('User'),

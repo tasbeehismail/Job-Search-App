@@ -1,6 +1,8 @@
 import Job from '../models/job.js';
 import AppError from '../utils/appError.js';
 import Application from '../models/application.js';
+import User from '../models/user.js';
+import Company from '../models/company.js';
 
 export const addJob = async (req, res, next) => {
     const { jobTitle, jobLocation, workingTime, seniorityLevel, jobDescription, technicalSkills, softSkills } = req.body;
@@ -55,6 +57,98 @@ export const deleteJob = async (req, res, next) => {
     await job.deleteOne(job._id);
     return res.status(200).json({ message: 'Job deleted successfully' });
 }
+
+export const getAllJobs = async (req, res, next) => {
+    const jobs = await Job.find()
+      .populate({
+        path: 'addedBy',
+        model: 'User',
+      });
+
+    if (!jobs.length) {
+      return next(new AppError('No jobs found', 404));
+    }
+    const jobsWithCompanyInfo = await Promise.all(
+      jobs.map(async (job) => {
+        const company = await Company.findOne({ companyHR: job.addedBy._id });
+        return {
+          _id: job._id,
+          jobTitle: job.jobTitle,
+          jobLocation: job.jobLocation,
+          workingTime: job.workingTime,
+          seniorityLevel: job.seniorityLevel,
+          jobDescription: job.jobDescription,
+          technicalSkills: job.technicalSkills,
+          softSkills: job.softSkills,
+          addedBy: {
+            name: job.addedBy.firstName + ' ' + job.addedBy.lastName,
+            email: job.addedBy.email
+          },
+          company: {
+            companyName: company.companyName,
+            description: company.description,
+            industry: company.industry,
+            address: company.address,
+            numberOfEmployees: company.numberOfEmployees,
+            companyEmail: company.companyEmail
+          }
+        };
+      })
+    );
+
+    return res.status(200).json({ message: 'Jobs retrieved successfully', data: jobsWithCompanyInfo });
+
+}
+
+export const getJobsByCompanyName = async (req, res, next) => {
+    const q = req.query.q;
+
+    const company = await Company.findOne({ companyName: q });
+    if (!company) {
+        return next(new AppError(`Company with name "${q}" not found.`, 404));
+    }
+
+    const users = await User.find({ _id: company.companyHR })
+    if (users.length === 0) {
+        return next(new AppError(`No HR users found for company "${q}".`, 404));
+    }
+
+    const jobs = await Job.find({ addedBy: { $in: users.map(user => user._id) } })
+        .populate({
+        path: 'addedBy',
+        model: 'User',
+        select: 'firstName lastName email'
+    })
+    if (!jobs.length) {
+        return next(new AppError('No jobs found with that name', 404));
+    }
+
+    const formattedJobs = jobs.map(job => ({
+        _id: job._id,
+        jobTitle: job.jobTitle,
+        jobLocation: job.jobLocation,
+        workingTime: job.workingTime,
+        seniorityLevel: job.seniorityLevel,
+        jobDescription: job.jobDescription,
+        technicalSkills: job.technicalSkills,
+        softSkills: job.softSkills,
+        addedBy: {
+          name: job.addedBy.firstName + ' ' + job.addedBy.lastName,
+          email: job.addedBy.email
+        },
+        company: {
+          companyName: company.companyName,
+          description: company.description,
+          industry: company.industry,
+          address: company.address,
+          numberOfEmployees: company.numberOfEmployees,
+          companyEmail: company.companyEmail
+        }
+      }));
+
+    return res.status(200).json({ data: formattedJobs });
+}
+
 
 
 export const applyJob = async (req, res, next) => {
